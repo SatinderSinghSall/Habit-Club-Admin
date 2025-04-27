@@ -18,10 +18,9 @@ const navItems = [
   { path: "/dashboard/contacts", label: "Contacts", icon: <FaEnvelope /> },
 ];
 
-const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(true);
+const Sidebar = ({ isOpen, setIsOpen }) => {
   const [isMobile, setIsMobile] = useState(false);
-  const [activeItem, setActiveItem] = useState("/dashboard"); // Default active item
+  const [activeItem, setActiveItem] = useState("/dashboard");
   const location = useLocation();
   const currentYear = new Date().getFullYear();
 
@@ -45,62 +44,86 @@ const Sidebar = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Update activeItem based on the current location
   useEffect(() => {
     setActiveItem(location.pathname);
   }, [location.pathname]);
 
+  const handleNavItemClick = (path) => {
+    setActiveItem(path);
+    if (isMobile) {
+      setIsOpen(false);
+    }
+  };
+
   return (
-    <div
-      className={`h-screen ${
-        isOpen ? "w-80" : "w-20"
-      } bg-gradient-to-b from-gray-900 to-gray-800 text-white shadow-lg flex flex-col transition-all duration-300 fixed md:relative z-20`}
-    >
-      {/* Top - Branding and toggle */}
-      <div className="flex items-center justify-between p-4">
-        <h1
-          className={`text-2xl font-bold whitespace-nowrap ${
-            isOpen ? "block" : "hidden"
-          } text-purple-500 transition-all`}
-        >
-          HabitClub Admin
-        </h1>
-        <button
-          onClick={toggleSidebar}
-          className="text-white text-2xl p-2 hover:bg-gray-700 rounded-lg"
-        >
-          {isOpen ? <FaChevronLeft /> : <FaBars />}
-        </button>
+    <>
+      <div
+        className={`top-0 left-0 bg-gradient-to-b from-gray-900 to-gray-800 text-white shadow-lg flex flex-col transition-all duration-300
+          ${
+            isMobile
+              ? isOpen
+                ? "fixed w-64 h-full translate-x-0 z-40"
+                : "fixed w-64 h-full -translate-x-full z-40"
+              : isOpen
+              ? "relative w-80 h-screen"
+              : "relative w-20 h-screen"
+          }
+        `}
+      >
+        {/* Branding and Toggle */}
+        <div className="flex items-center justify-between p-4">
+          <h1
+            className={`text-2xl font-bold whitespace-nowrap ${
+              isOpen ? "block" : "hidden"
+            } text-purple-400 transition-all`}
+          >
+            HabitClub Admin
+          </h1>
+          <button
+            onClick={toggleSidebar}
+            className="text-white text-2xl p-2 hover:bg-gray-700 rounded-lg block md:hidden"
+          >
+            {isOpen ? <FaChevronLeft /> : <FaBars />}
+          </button>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex flex-col mt-8 gap-2">
+          {navItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              onClick={() => handleNavItemClick(item.path)}
+              className={`flex items-center gap-4 py-3 px-4 mx-2 rounded-lg transition-all duration-200 ${
+                activeItem === item.path ? "bg-purple-600" : "hover:bg-gray-700"
+              }`}
+            >
+              <span className="text-xl">{item.icon}</span>
+              {isOpen && (
+                <span className="text-base font-medium tracking-wide">
+                  {item.label}
+                </span>
+              )}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Footer */}
+        {isOpen && (
+          <div className="mt-auto p-4 text-xs text-gray-400 text-center">
+            © {currentYear} HabitClub Admin
+          </div>
+        )}
       </div>
 
-      {/* Navigation Links */}
-      <nav className="flex flex-col mt-8 gap-4">
-        {navItems.map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
-            onClick={() => setActiveItem(item.path)} // Set active item when clicked
-            className={`flex items-center gap-4 py-3 px-4 mx-2 rounded-lg transition-all ${
-              activeItem === item.path ? "bg-purple-600" : "hover:bg-gray-700"
-            }`}
-          >
-            <span className="text-xl">{item.icon}</span>
-            {isOpen && (
-              <span className="text-base font-medium tracking-wide">
-                {item.label}
-              </span>
-            )}
-          </Link>
-        ))}
-      </nav>
-
-      {/* Bottom - Version / copyright */}
-      {isOpen && (
-        <div className="mt-auto p-4 text-xs text-gray-400 text-center">
-          © {currentYear} HabitClub Admin
-        </div>
+      {/* Mobile Overlay */}
+      {isMobile && isOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-30"
+          onClick={toggleSidebar}
+        />
       )}
-    </div>
+    </>
   );
 };
 
