@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   FaTachometerAlt,
   FaUserShield,
@@ -10,9 +10,20 @@ import {
   FaChevronLeft,
 } from "react-icons/fa";
 
+const navItems = [
+  { path: "/dashboard", label: "Dashboard", icon: <FaTachometerAlt /> },
+  { path: "/dashboard/admins", label: "Admins", icon: <FaUserShield /> },
+  { path: "/dashboard/users", label: "Users", icon: <FaUsers /> },
+  { path: "/dashboard/habits", label: "Habits", icon: <FaClipboardList /> },
+  { path: "/dashboard/contacts", label: "Contacts", icon: <FaEnvelope /> },
+];
+
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const [activeItem, setActiveItem] = useState("/dashboard"); // Default active item
+  const location = useLocation();
+  const currentYear = new Date().getFullYear();
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -21,88 +32,74 @@ const Sidebar = () => {
   const handleResize = () => {
     if (window.innerWidth < 768) {
       setIsMobile(true);
+      setIsOpen(false);
     } else {
       setIsMobile(false);
       setIsOpen(true);
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Update activeItem based on the current location
+  useEffect(() => {
+    setActiveItem(location.pathname);
+  }, [location.pathname]);
+
   return (
     <div
       className={`h-screen ${
-        isOpen ? "w-64" : "w-20"
-      } bg-gray-800 text-white shadow-lg p-6 flex flex-col transition-all ease-in-out duration-300 
-      ${isMobile ? "fixed top-0 left-0" : "relative"}`}
+        isOpen ? "w-80" : "w-20"
+      } bg-gradient-to-b from-gray-900 to-gray-800 text-white shadow-lg flex flex-col transition-all duration-300 fixed md:relative z-20`}
     >
-      <div className="flex justify-between items-center mb-10">
+      {/* Top - Branding and toggle */}
+      <div className="flex items-center justify-between p-4">
         <h1
-          className={`text-2xl font-bold ${
+          className={`text-2xl font-bold whitespace-nowrap ${
             isOpen ? "block" : "hidden"
           } text-purple-500 transition-all`}
         >
           HabitClub Admin
         </h1>
-
-        {/* Hamburger icon for mobile */}
-        {isMobile && (
-          <button
-            onClick={toggleSidebar}
-            className="text-white text-2xl p-2 hover:bg-gray-700 rounded-lg"
-            aria-label="Toggle Sidebar"
-          >
-            {isOpen ? <FaChevronLeft /> : <FaBars />}
-          </button>
-        )}
+        <button
+          onClick={toggleSidebar}
+          className="text-white text-2xl p-2 hover:bg-gray-700 rounded-lg"
+        >
+          {isOpen ? <FaChevronLeft /> : <FaBars />}
+        </button>
       </div>
 
-      <nav className="flex flex-col gap-6">
-        <Link
-          to="/dashboard"
-          className="flex items-center gap-3 text-lg hover:text-purple-400 transition-all"
-          aria-label="Go to Dashboard"
-        >
-          <FaTachometerAlt className="text-xl" />
-          {isOpen && "Dashboard"}
-        </Link>
-        <Link
-          to="/dashboard/admins"
-          className="flex items-center gap-3 text-lg hover:text-purple-400 transition-all"
-          aria-label="Go to Admins"
-        >
-          <FaUserShield className="text-xl" />
-          {isOpen && "Admins"}
-        </Link>
-        <Link
-          to="/dashboard/users"
-          className="flex items-center gap-3 text-lg hover:text-purple-400 transition-all"
-          aria-label="Go to Users"
-        >
-          <FaUsers className="text-xl" />
-          {isOpen && "Users"}
-        </Link>
-        <Link
-          to="/dashboard/habits"
-          className="flex items-center gap-3 text-lg hover:text-purple-400 transition-all"
-          aria-label="Go to Habits"
-        >
-          <FaClipboardList className="text-xl" />
-          {isOpen && "Habits"}
-        </Link>
-        <Link
-          to="/dashboard/contacts"
-          className="flex items-center gap-3 text-lg hover:text-purple-400 transition-all"
-          aria-label="Go to Contact Messages"
-        >
-          <FaEnvelope className="text-xl" />
-          {isOpen && "Contact Messages"}
-        </Link>
+      {/* Navigation Links */}
+      <nav className="flex flex-col mt-8 gap-4">
+        {navItems.map((item) => (
+          <Link
+            key={item.path}
+            to={item.path}
+            onClick={() => setActiveItem(item.path)} // Set active item when clicked
+            className={`flex items-center gap-4 py-3 px-4 mx-2 rounded-lg transition-all ${
+              activeItem === item.path ? "bg-purple-600" : "hover:bg-gray-700"
+            }`}
+          >
+            <span className="text-xl">{item.icon}</span>
+            {isOpen && (
+              <span className="text-base font-medium tracking-wide">
+                {item.label}
+              </span>
+            )}
+          </Link>
+        ))}
       </nav>
+
+      {/* Bottom - Version / copyright */}
+      {isOpen && (
+        <div className="mt-auto p-4 text-xs text-gray-400 text-center">
+          © {currentYear} HabitClub Admin
+        </div>
+      )}
     </div>
   );
 };

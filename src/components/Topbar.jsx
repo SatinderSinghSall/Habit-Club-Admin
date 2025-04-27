@@ -1,10 +1,20 @@
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Topbar = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
+    toast.info("Logged out successfully 👋", {
+      position: "top-right",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      theme: "colored",
+    });
     navigate("/login");
   };
 
