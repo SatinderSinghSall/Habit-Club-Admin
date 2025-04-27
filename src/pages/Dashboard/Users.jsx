@@ -34,20 +34,20 @@ function Users() {
   }
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Users</h1>
+    <div className="p-4 sm:p-6">
+      <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Users</h1>
 
-      <div className="overflow-x-auto rounded-2xl shadow-md">
-        <table className="min-w-full bg-white">
+      <div className="overflow-x-auto rounded-xl shadow-md">
+        <table className="min-w-full bg-white text-sm sm:text-base">
           <thead className="bg-gray-100">
             <tr>
-              <th className="py-3 px-6 text-left text-sm font-semibold text-gray-700">
+              <th className="py-2 sm:py-3 px-4 sm:px-6 text-left font-semibold text-gray-700">
                 Name
               </th>
-              <th className="py-3 px-6 text-left text-sm font-semibold text-gray-700">
+              <th className="py-2 sm:py-3 px-4 sm:px-6 text-left font-semibold text-gray-700">
                 Email
               </th>
-              <th className="py-3 px-6 text-left text-sm font-semibold text-gray-700">
+              <th className="py-2 sm:py-3 px-4 sm:px-6 text-left font-semibold text-gray-700">
                 Status
               </th>
             </tr>
@@ -55,9 +55,11 @@ function Users() {
           <tbody>
             {users.map((user) => (
               <tr key={user._id} className="border-b hover:bg-gray-50">
-                <td className="py-4 px-6">{user.name}</td>
-                <td className="py-4 px-6">{user.email}</td>
-                <td className="py-4 px-6">{user.status}</td>
+                <td className="py-3 sm:py-4 px-4 sm:px-6">{user.name}</td>
+                <td className="py-3 sm:py-4 px-4 sm:px-6 break-all">
+                  {user.email}
+                </td>
+                <td className="py-3 sm:py-4 px-4 sm:px-6">{user.status}</td>
               </tr>
             ))}
           </tbody>

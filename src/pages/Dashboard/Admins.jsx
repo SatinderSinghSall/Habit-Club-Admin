@@ -28,28 +28,28 @@ function Admins() {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>; // Show loading message while fetching data
+    return <div>Loading...</div>;
   }
 
   if (error) {
-    return <div>{error}</div>; // Show error message if there's an issue fetching data
+    return <div>{error}</div>;
   }
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Admins</h1>
+    <div className="p-4 sm:p-6">
+      <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Admins</h1>
 
-      <div className="overflow-x-auto rounded-2xl shadow-md">
-        <table className="min-w-full bg-white">
+      <div className="overflow-x-auto rounded-xl shadow-md">
+        <table className="min-w-full bg-white text-sm sm:text-base">
           <thead className="bg-gray-100">
             <tr>
-              <th className="py-3 px-6 text-left text-sm font-semibold text-gray-700">
+              <th className="py-2 sm:py-3 px-4 sm:px-6 text-left font-semibold text-gray-700">
                 Name
               </th>
-              <th className="py-3 px-6 text-left text-sm font-semibold text-gray-700">
+              <th className="py-2 sm:py-3 px-4 sm:px-6 text-left font-semibold text-gray-700">
                 Email
               </th>
-              <th className="py-3 px-6 text-left text-sm font-semibold text-gray-700">
+              <th className="py-2 sm:py-3 px-4 sm:px-6 text-left font-semibold text-gray-700">
                 Role
               </th>
             </tr>
@@ -57,9 +57,13 @@ function Admins() {
           <tbody>
             {admins.map((admin) => (
               <tr key={admin._id} className="border-b hover:bg-gray-50">
-                <td className="py-4 px-6">{admin.name}</td>
-                <td className="py-4 px-6">{admin.email}</td>
-                <td className="py-4 px-6">{admin.role || "Admin"}</td>
+                <td className="py-3 sm:py-4 px-4 sm:px-6">{admin.name}</td>
+                <td className="py-3 sm:py-4 px-4 sm:px-6 break-all">
+                  {admin.email}
+                </td>
+                <td className="py-3 sm:py-4 px-4 sm:px-6">
+                  {admin.role || "Admin"}
+                </td>
               </tr>
             ))}
           </tbody>
