@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from "react";
+import { toast as notify } from "react-toastify";
+import { toast } from "react-hot-toast";
 
 function Users() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false); // New state for delete confirmation
-  const [newUser, setNewUser] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
-  const [editUser, setEditUser] = useState(null); // user being edited
-  const [userToDelete, setUserToDelete] = useState(null); // user to delete
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [newUser, setNewUser] = useState({ name: "", email: "", password: "" });
+  const [editUser, setEditUser] = useState(null);
+  const [userToDelete, setUserToDelete] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -34,25 +32,22 @@ function Users() {
       });
 
       const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Failed to save user");
 
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to save user");
-      }
-
-      if (editUser) {
-        setUsers((prev) =>
-          prev.map((u) => (u._id === editUser._id ? data : u))
-        );
-      } else {
-        setUsers((prev) => [...prev, data]);
-      }
+      setUsers((prev) =>
+        editUser
+          ? prev.map((u) => (u._id === editUser._id ? data : u))
+          : [...prev, data]
+      );
 
       setNewUser({ name: "", email: "", password: "" });
       setEditUser(null);
       setShowModal(false);
+
+      toast.success(editUser ? "User updated" : "User added"); // hot-toast
     } catch (err) {
       console.error("Save user error:", err.message);
-      alert(`❌ ${err.message}`);
+      toast.error(err.message); // hot-toast
     }
   };
 
@@ -60,28 +55,25 @@ function Users() {
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/users/${userToDelete._id}`,
-        {
-          method: "DELETE",
-        }
+        { method: "DELETE" }
       );
-
       const data = await response.json();
-
-      if (!response.ok) {
+      if (!response.ok)
         throw new Error(data.message || "Failed to delete user");
-      }
 
       setUsers((prev) => prev.filter((u) => u._id !== userToDelete._id));
-      setShowDeleteModal(false); // Close the modal after deletion
+      setShowDeleteModal(false);
+
+      notify.success("User deleted");
     } catch (err) {
       console.error("Delete error:", err.message);
-      alert(`❌ ${err.message}`);
+      notify.error(err.message);
     }
   };
 
   const handleEditClick = (user) => {
     setEditUser(user);
-    setNewUser({ name: user.name, email: user.email, password: "" }); // Don't prefill password
+    setNewUser({ name: user.name, email: user.email, password: "" });
     setShowModal(true);
   };
 
@@ -99,9 +91,7 @@ function Users() {
     const fetchUsers = async () => {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/users`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch users");
-        }
+        if (!response.ok) throw new Error("Failed to fetch users");
         const data = await response.json();
         setUsers(data);
         setLoading(false);
@@ -115,116 +105,114 @@ function Users() {
     fetchUsers();
   }, []);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>{error}</div>;
-  }
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div className="p-4 sm:p-6">
       <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Users</h1>
 
-      <div className="overflow-x-auto rounded-xl shadow-md">
-        <div className="mb-4">
-          <button
-            onClick={() => setShowModal(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-          >
-            Add a User
-          </button>
-        </div>
+      <div className="mb-4">
+        <button
+          onClick={() => setShowModal(true)}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+        >
+          Add a User
+        </button>
+      </div>
 
-        {showModal && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md relative">
-              <h2 className="text-lg font-semibold mb-4">Add a New User</h2>
-              <form onSubmit={handleAddUser} className="space-y-4">
-                <input
-                  type="text"
-                  name="name"
-                  value={newUser.name}
-                  onChange={handleInputChange}
-                  placeholder="Name"
-                  className="w-full border p-2 rounded"
-                />
-                <input
-                  type="email"
-                  name="email"
-                  value={newUser.email}
-                  onChange={handleInputChange}
-                  placeholder="Email"
-                  className="w-full border p-2 rounded"
-                />
-                <input
-                  type="password"
-                  name="password"
-                  value={newUser.password}
-                  onChange={handleInputChange}
-                  placeholder="Password"
-                  className="w-full border p-2 rounded"
-                />
+      {/* Add/Edit User Modal */}
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-xl shadow-lg p-6 w-[90%] sm:max-w-md relative">
+            <h2 className="text-lg font-semibold mb-4">
+              {editUser ? "Edit User" : "Add a New User"}
+            </h2>
+            <form onSubmit={handleAddUser} className="space-y-4">
+              <input
+                type="text"
+                name="name"
+                value={newUser.name}
+                onChange={handleInputChange}
+                placeholder="Name"
+                className="w-full border p-2 rounded"
+              />
+              <input
+                type="email"
+                name="email"
+                value={newUser.email}
+                onChange={handleInputChange}
+                placeholder="Email"
+                className="w-full border p-2 rounded"
+              />
+              <input
+                type="password"
+                name="password"
+                value={newUser.password}
+                onChange={handleInputChange}
+                placeholder="Password"
+                className="w-full border p-2 rounded"
+              />
 
-                <div className="flex justify-end space-x-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowModal(false)}
-                    className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                  >
-                    Add
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {showDeleteModal && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md relative">
-              <h2 className="text-lg font-semibold mb-4">Are you sure?</h2>
-              <p className="mb-4">Are you sure you want to delete this user?</p>
-              <div className="flex justify-end space-x-2">
+              <div className="flex justify-end gap-2">
                 <button
                   type="button"
-                  onClick={closeDeleteModal}
+                  onClick={() => setShowModal(false)}
                   className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
                 >
                   Cancel
                 </button>
                 <button
-                  type="button"
-                  onClick={handleDeleteUser}
-                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                 >
-                  Delete
+                  {editUser ? "Update" : "Add"}
                 </button>
               </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm Delete Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-xl shadow-lg p-6 w-[90%] sm:max-w-md relative">
+            <h2 className="text-lg font-semibold mb-4">Are you sure?</h2>
+            <p className="mb-4">Are you sure you want to delete this user?</p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={closeDeleteModal}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteUser}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Delete
+              </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        <table className="min-w-full bg-white text-sm sm:text-base">
+      {/* User Table */}
+      <div className="overflow-x-auto rounded-xl shadow-md">
+        <table className="min-w-full bg-white text-xs sm:text-sm">
           <thead className="bg-gray-100">
             <tr>
-              <th className="py-2 sm:py-3 px-4 sm:px-6 text-left font-semibold text-gray-700">
+              <th className="py-2 px-4 text-left font-semibold text-gray-700">
                 Name
               </th>
-              <th className="py-2 sm:py-3 px-4 sm:px-6 text-left font-semibold text-gray-700">
+              <th className="py-2 px-4 text-left font-semibold text-gray-700">
                 Email
               </th>
-              <th className="py-2 sm:py-3 px-4 sm:px-6 text-left font-semibold text-gray-700">
+              <th className="py-2 px-4 text-left font-semibold text-gray-700">
                 Status
               </th>
-              <th className="py-2 sm:py-3 px-4 sm:px-6 text-left font-semibold text-gray-700">
+              <th className="py-2 px-4 text-left font-semibold text-gray-700">
                 Actions
               </th>
             </tr>
@@ -232,26 +220,24 @@ function Users() {
           <tbody>
             {users.map((user) => (
               <tr key={user._id} className="border-b hover:bg-gray-50">
-                <td className="py-3 sm:py-4 px-4 sm:px-6">{user.name}</td>
-                <td className="py-3 sm:py-4 px-4 sm:px-6 break-all">
-                  {user.email}
-                </td>
-                <td className="py-3 sm:py-4 px-4 sm:px-6">{user.status}</td>
-
-                {/* Action Buttons: Edit and Delete */}
-                <td className="py-3 sm:py-4 px-4 sm:px-6 flex gap-2">
-                  <button
-                    onClick={() => handleEditClick(user)}
-                    className="text-blue-600 hover:underline"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => openDeleteModal(user)}
-                    className="text-red-600 hover:underline"
-                  >
-                    Delete
-                  </button>
+                <td className="py-3 px-4">{user.name}</td>
+                <td className="py-3 px-4 break-all">{user.email}</td>
+                <td className="py-3 px-4">{user.status || "Active"}</td>
+                <td className="py-3 px-4">
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <button
+                      onClick={() => handleEditClick(user)}
+                      className="text-blue-600 hover:underline"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => openDeleteModal(user)}
+                      className="text-red-600 hover:underline"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

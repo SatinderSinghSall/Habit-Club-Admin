@@ -3,6 +3,7 @@ import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Toaster } from "react-hot-toast";
 
 import Dashboard from "./pages/Dashboard";
 import Overview from "./pages/Dashboard/Overview";
@@ -36,7 +37,7 @@ function App() {
           </Route>
         </Routes>
 
-        {/* Toasts are globally available here */}
+        {/* react-toastify */}
         <ToastContainer
           position="top-right"
           autoClose={3000}
@@ -45,6 +46,18 @@ function App() {
           closeOnClick
           pauseOnHover
           theme="colored"
+        />
+
+        {/* react-hot-toast */}
+        <Toaster
+          position="bottom-left"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              background: "#333",
+              color: "#fff",
+            },
+          }}
         />
       </>
     </Router>

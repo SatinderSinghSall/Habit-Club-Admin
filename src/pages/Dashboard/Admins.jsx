@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 
 function Admins() {
   const [admins, setAdmins] = useState([]);
@@ -52,9 +53,11 @@ function Admins() {
       if (!response.ok) throw new Error("Failed to add admin");
       const data = await response.json();
       setAdmins((prev) => [...prev, data]);
+      toast.success("Admin added"); // ✅ toast here
       closeModal();
     } catch (err) {
       console.error(err);
+      toast.error(err.message); // ✅ toast error
       setError(err.message);
     }
   };
@@ -81,9 +84,11 @@ function Admins() {
       setAdmins((prev) =>
         prev.map((a) => (a._id === updated._id ? updated : a))
       );
+      toast.success("Admin updated"); // ✅ toast here
       closeModal();
     } catch (err) {
       console.error(err);
+      toast.error(err.message); // ✅ toast error
       setError(err.message);
     }
   };
@@ -104,9 +109,11 @@ function Admins() {
       setAdmins((prev) =>
         prev.filter((admin) => admin._id !== confirmState.adminId)
       );
+      toast.success("Admin deleted"); // ✅ toast here
       setConfirmState({ show: false, adminId: null });
     } catch (err) {
       console.error(err);
+      toast.error(err.message); // ✅ toast error
       setError(err.message);
     }
   };
@@ -126,7 +133,7 @@ function Admins() {
 
   return (
     <div className="p-4 sm:p-6">
-      <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Admins</h1>
+      <h1 className="text-lg sm:text-2xl font-bold mb-4">Admins</h1>
 
       <div className="mb-4">
         <button
@@ -140,7 +147,7 @@ function Admins() {
       {/* Add/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md relative">
+          <div className="bg-white rounded-xl p-6 w-[90%] sm:max-w-md relative">
             <h2 className="text-lg font-semibold mb-4">
               {editingAdmin ? "Edit Admin" : "Add New Admin"}
             </h2>
@@ -200,7 +207,7 @@ function Admins() {
       {/* Confirm Delete Modal */}
       {confirmState.show && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-[90%] sm:max-w-sm">
             <h3 className="text-lg font-semibold mb-4">Confirm Deletion</h3>
             <p className="mb-6">Are you sure you want to delete this admin?</p>
             <div className="flex justify-end gap-2">
@@ -223,7 +230,7 @@ function Admins() {
 
       {/* Admin Table */}
       <div className="overflow-x-auto rounded-xl shadow-md">
-        <table className="min-w-full bg-white text-sm sm:text-base">
+        <table className="min-w-full bg-white text-xs sm:text-sm">
           <thead className="bg-gray-100">
             <tr>
               <th className="py-2 px-4 text-left font-semibold text-gray-700">
@@ -246,19 +253,21 @@ function Admins() {
                 <td className="py-3 px-4">{admin.name}</td>
                 <td className="py-3 px-4 break-all">{admin.email}</td>
                 <td className="py-3 px-4">{admin.role || "Admin"}</td>
-                <td className="py-3 px-4 flex gap-2">
-                  <button
-                    onClick={() => handleEdit(admin)}
-                    className="bg-yellow-400 text-white px-3 py-1 rounded hover:bg-yellow-500"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(admin._id)}
-                    className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-                  >
-                    Delete
-                  </button>
+                <td className="py-3 px-4">
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <button
+                      onClick={() => handleEdit(admin)}
+                      className="bg-yellow-400 text-white px-3 py-1 rounded hover:bg-yellow-500"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(admin._id)}
+                      className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
