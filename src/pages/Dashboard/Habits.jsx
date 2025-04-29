@@ -1,9 +1,11 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import CustomAlert from "../../components/CustomAlert"; // Import CustomAlert
 
 function Habits() {
   const [habits, setHabits] = useState([]);
   const [selectedHabit, setSelectedHabit] = useState(null);
+  const [alert, setAlert] = useState(null); // State to control the custom alert visibility
 
   useEffect(() => {
     const fetchHabits = async () => {
@@ -19,6 +21,25 @@ function Habits() {
 
     fetchHabits();
   }, []);
+
+  // Delete habit
+  const deleteHabit = async (habitId) => {
+    try {
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API_URL}/habits/${habitId}`
+      );
+      // Filter out the deleted habit from the state
+      setHabits(habits.filter((habit) => habit._id !== habitId));
+      setAlert({ message: response.data.message, type: "success" }); // Show success alert
+    } catch (error) {
+      console.error("Failed to delete habit:", error);
+      setAlert({ message: "Failed to delete habit", type: "error" }); // Show error alert
+    }
+  };
+
+  const closeAlert = () => {
+    setAlert(null); // Close the alert
+  };
 
   return (
     <div className="p-6">
@@ -37,6 +58,9 @@ function Habits() {
               <th className="py-4 px-6 text-left text-base font-semibold text-gray-700">
                 Created At
               </th>
+              <th className="py-4 px-6 text-left text-base font-semibold text-gray-700">
+                Action
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -51,11 +75,32 @@ function Habits() {
                 <td className="py-5 px-6">
                   {new Date(habit.createdAt).toLocaleDateString()}
                 </td>
+
+                <td className="py-5 px-6">
+                  <button
+                    className="text-red-500 hover:text-red-700"
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent row click
+                      deleteHabit(habit._id);
+                    }}
+                  >
+                    Delete
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {/* Custom Alert */}
+      {alert && (
+        <CustomAlert
+          message={alert.message}
+          type={alert.type}
+          onClose={closeAlert}
+        />
+      )}
 
       {/* Modal */}
       {selectedHabit && (
