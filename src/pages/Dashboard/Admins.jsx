@@ -44,20 +44,33 @@ function Admins() {
 
   const handleAddAdmin = async (e) => {
     e.preventDefault();
+
+    // ✅ Simple client-side validation
+    const { name, email, password } = newAdmin;
+    if (!name || !email || !password) {
+      toast.error("All fields are required.");
+      return;
+    }
+
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/admin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newAdmin),
       });
-      if (!response.ok) throw new Error("Failed to add admin");
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to add admin");
+      }
+
       const data = await response.json();
       setAdmins((prev) => [...prev, data]);
-      toast.success("Admin added"); // ✅ toast here
+      toast.success("Admin added");
       closeModal();
     } catch (err) {
       console.error(err);
-      toast.error(err.message); // ✅ toast error
+      toast.error(err.message);
       setError(err.message);
     }
   };
@@ -161,7 +174,6 @@ function Admins() {
                 value={newAdmin.name}
                 onChange={handleInputChange}
                 placeholder="Name"
-                required
                 className="w-full border p-2 rounded"
               />
               <input
@@ -170,7 +182,6 @@ function Admins() {
                 value={newAdmin.email}
                 onChange={handleInputChange}
                 placeholder="Email"
-                required
                 className="w-full border p-2 rounded"
               />
               {!editingAdmin && (
@@ -180,7 +191,6 @@ function Admins() {
                   value={newAdmin.password}
                   onChange={handleInputChange}
                   placeholder="Password"
-                  required
                   className="w-full border p-2 rounded"
                 />
               )}
