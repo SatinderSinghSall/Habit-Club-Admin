@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import CustomAlert from "../../components/CustomAlert"; // Import CustomAlert
+import CustomAlert from "../../components/CustomAlert";
 
 function Habits() {
   const [habits, setHabits] = useState([]);
