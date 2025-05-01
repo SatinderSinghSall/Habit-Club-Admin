@@ -5,7 +5,8 @@ import CustomAlert from "../../components/CustomAlert";
 function Habits() {
   const [habits, setHabits] = useState([]);
   const [selectedHabit, setSelectedHabit] = useState(null);
-  const [alert, setAlert] = useState(null); // State to control the custom alert visibility
+  const [alert, setAlert] = useState(null);
+  const [habitToDelete, setHabitToDelete] = useState(null); // For confirmation modal
 
   useEffect(() => {
     const fetchHabits = async () => {
@@ -22,23 +23,21 @@ function Habits() {
     fetchHabits();
   }, []);
 
-  // Delete habit
   const deleteHabit = async (habitId) => {
     try {
       const response = await axios.delete(
         `${import.meta.env.VITE_API_URL}/habits/${habitId}`
       );
-      // Filter out the deleted habit from the state
       setHabits(habits.filter((habit) => habit._id !== habitId));
-      setAlert({ message: response.data.message, type: "success" }); // Show success alert
+      setAlert({ message: response.data.message, type: "success" });
     } catch (error) {
       console.error("Failed to delete habit:", error);
-      setAlert({ message: "Failed to delete habit", type: "error" }); // Show error alert
+      setAlert({ message: "Failed to delete habit", type: "error" });
     }
   };
 
   const closeAlert = () => {
-    setAlert(null); // Close the alert
+    setAlert(null);
   };
 
   return (
@@ -75,13 +74,12 @@ function Habits() {
                 <td className="py-5 px-6">
                   {new Date(habit.createdAt).toLocaleDateString()}
                 </td>
-
                 <td className="py-5 px-6">
                   <button
                     className="text-red-500 hover:text-red-700"
                     onClick={(e) => {
-                      e.stopPropagation(); // Prevent row click
-                      deleteHabit(habit._id);
+                      e.stopPropagation();
+                      setHabitToDelete(habit); // Trigger confirmation modal
                     }}
                   >
                     Delete
@@ -92,6 +90,37 @@ function Habits() {
           </tbody>
         </table>
       </div>
+
+      {/* Confirmation Modal */}
+      {habitToDelete && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 relative">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+              Confirm Delete
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete the habit "{habitToDelete.name}"?
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700"
+                onClick={() => setHabitToDelete(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white"
+                onClick={async () => {
+                  await deleteHabit(habitToDelete._id);
+                  setHabitToDelete(null);
+                }}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Custom Alert */}
       {alert && (
