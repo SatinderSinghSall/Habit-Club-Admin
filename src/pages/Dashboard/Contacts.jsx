@@ -31,6 +31,22 @@ function Contacts() {
     setSelectedContact(null);
   };
 
+  const deleteContact = async () => {
+    if (!selectedContact) return;
+
+    try {
+      // Send DELETE request to the backend with the selected contact's ID
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/contact/${selectedContact._id}`
+      );
+      // Update the contacts state by filtering out the deleted contact
+      setContacts((prev) => prev.filter((c) => c._id !== selectedContact._id));
+      closeModal(); // Close the modal after deletion
+    } catch (error) {
+      console.error("Failed to delete contact:", error);
+    }
+  };
+
   return (
     <div className="p-6 min-h-screen">
       <h1 className="text-3xl font-semibold mb-8 text-gray-800">Contacts</h1>
@@ -105,6 +121,12 @@ function Contacts() {
                 className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-full hover:bg-indigo-700 transition"
               >
                 Close
+              </button>
+              <button
+                onClick={deleteContact}
+                className="px-6 py-2 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition"
+              >
+                Delete
               </button>
             </div>
           </div>
