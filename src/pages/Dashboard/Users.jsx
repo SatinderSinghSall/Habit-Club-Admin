@@ -218,29 +218,55 @@ function Users() {
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
-              <tr key={user._id} className="border-b hover:bg-gray-50">
-                <td className="py-3 px-4">{user.name}</td>
-                <td className="py-3 px-4 break-all">{user.email}</td>
-                <td className="py-3 px-4">{user.status || "Active"}</td>
-                <td className="py-3 px-4">
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <button
-                      onClick={() => handleEditClick(user)}
-                      className="text-blue-600 hover:underline"
+            {users.length === 0 ? (
+              <tr>
+                <td colSpan="4" className="py-6 px-4 text-center text-gray-500">
+                  <div className="flex flex-col items-center justify-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-10 w-10 mb-2 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
                     >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => openDeleteModal(user)}
-                      className="text-red-600 hover:underline"
-                    >
-                      Delete
-                    </button>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M18 9l-6 6-6-6"
+                      />
+                    </svg>
+                    <p className="text-sm">
+                      No users found. Add a new user to get started.
+                    </p>
                   </div>
                 </td>
               </tr>
-            ))}
+            ) : (
+              users.map((user) => (
+                <tr key={user._id} className="border-b hover:bg-gray-50">
+                  <td className="py-3 px-4">{user.name}</td>
+                  <td className="py-3 px-4 break-all">{user.email}</td>
+                  <td className="py-3 px-4">{user.status || "Active"}</td>
+                  <td className="py-3 px-4">
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <button
+                        onClick={() => handleEditClick(user)}
+                        className="text-blue-600 hover:underline"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => openDeleteModal(user)}
+                        className="text-red-600 hover:underline"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

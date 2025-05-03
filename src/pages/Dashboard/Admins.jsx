@@ -44,8 +44,6 @@ function Admins() {
 
   const handleAddAdmin = async (e) => {
     e.preventDefault();
-
-    // ✅ Simple client-side validation
     const { name, email, password } = newAdmin;
     if (!name || !email || !password) {
       toast.error("All fields are required.");
@@ -97,11 +95,11 @@ function Admins() {
       setAdmins((prev) =>
         prev.map((a) => (a._id === updated._id ? updated : a))
       );
-      toast.success("Admin updated"); // ✅ toast here
+      toast.success("Admin updated");
       closeModal();
     } catch (err) {
       console.error(err);
-      toast.error(err.message); // ✅ toast error
+      toast.error(err.message);
       setError(err.message);
     }
   };
@@ -122,11 +120,11 @@ function Admins() {
       setAdmins((prev) =>
         prev.filter((admin) => admin._id !== confirmState.adminId)
       );
-      toast.success("Admin deleted"); // ✅ toast here
+      toast.success("Admin deleted");
       setConfirmState({ show: false, adminId: null });
     } catch (err) {
       console.error(err);
-      toast.error(err.message); // ✅ toast error
+      toast.error(err.message);
       setError(err.message);
     }
   };
@@ -238,52 +236,77 @@ function Admins() {
         </div>
       )}
 
-      {/* Admin Table */}
-      <div className="overflow-x-auto rounded-xl shadow-md">
-        <table className="min-w-full bg-white text-xs sm:text-sm">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="py-2 px-4 text-left font-semibold text-gray-700">
-                Name
-              </th>
-              <th className="py-2 px-4 text-left font-semibold text-gray-700">
-                Email
-              </th>
-              <th className="py-2 px-4 text-left font-semibold text-gray-700">
-                Role
-              </th>
-              <th className="py-2 px-4 text-left font-semibold text-gray-700">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {admins.map((admin) => (
-              <tr key={admin._id} className="border-b hover:bg-gray-50">
-                <td className="py-3 px-4">{admin.name}</td>
-                <td className="py-3 px-4 break-all">{admin.email}</td>
-                <td className="py-3 px-4">{admin.role || "Admin"}</td>
-                <td className="py-3 px-4">
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <button
-                      onClick={() => handleEdit(admin)}
-                      className="bg-yellow-400 text-white px-3 py-1 rounded hover:bg-yellow-500"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(admin._id)}
-                      className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </td>
+      {/* No Admins Found */}
+      {admins.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-gray-500">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-16 w-16 mb-4 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={1.5}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15.75 9A3.75 3.75 0 1112 5.25 3.75 3.75 0 0115.75 9zM4.5 20.25a8.25 8.25 0 0115 0"
+            />
+          </svg>
+          <p className="text-lg font-medium text-gray-600 mb-1">
+            No Admins Found
+          </p>
+          <p className="text-sm text-gray-400">
+            Start by adding a new admin to manage your app.
+          </p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto rounded-xl shadow-md">
+          <table className="min-w-full bg-white text-xs sm:text-sm">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="py-2 px-4 text-left font-semibold text-gray-700">
+                  Name
+                </th>
+                <th className="py-2 px-4 text-left font-semibold text-gray-700">
+                  Email
+                </th>
+                <th className="py-2 px-4 text-left font-semibold text-gray-700">
+                  Role
+                </th>
+                <th className="py-2 px-4 text-left font-semibold text-gray-700">
+                  Actions
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {admins.map((admin) => (
+                <tr key={admin._id} className="border-b hover:bg-gray-50">
+                  <td className="py-3 px-4">{admin.name}</td>
+                  <td className="py-3 px-4 break-all">{admin.email}</td>
+                  <td className="py-3 px-4">{admin.role || "Admin"}</td>
+                  <td className="py-3 px-4">
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <button
+                        onClick={() => handleEdit(admin)}
+                        className="bg-yellow-400 text-white px-3 py-1 rounded hover:bg-yellow-500"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(admin._id)}
+                        className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

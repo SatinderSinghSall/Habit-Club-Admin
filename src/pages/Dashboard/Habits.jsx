@@ -63,30 +63,59 @@ function Habits() {
             </tr>
           </thead>
           <tbody>
-            {habits.map((habit) => (
-              <tr
-                key={habit._id}
-                className="border-b hover:bg-gray-50 cursor-pointer transition"
-                onClick={() => setSelectedHabit(habit)}
-              >
-                <td className="py-5 px-6">{habit.name}</td>
-                <td className="py-5 px-6">{habit.user?.name || "Unknown"}</td>
-                <td className="py-5 px-6">
-                  {new Date(habit.createdAt).toLocaleDateString()}
-                </td>
-                <td className="py-5 px-6">
-                  <button
-                    className="text-red-500 hover:text-red-700"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setHabitToDelete(habit); // Trigger confirmation modal
-                    }}
-                  >
-                    Delete
-                  </button>
+            {habits.length > 0 ? (
+              habits.map((habit) => (
+                <tr
+                  key={habit._id}
+                  className="border-b hover:bg-gray-50 cursor-pointer transition"
+                  onClick={() => setSelectedHabit(habit)}
+                >
+                  <td className="py-5 px-6">{habit.name}</td>
+                  <td className="py-5 px-6">{habit.user?.name || "Unknown"}</td>
+                  <td className="py-5 px-6">
+                    {new Date(habit.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="py-5 px-6">
+                    <button
+                      className="text-red-500 hover:text-red-700"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setHabitToDelete(habit);
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan="4"
+                  className="py-12 text-center text-gray-500 text-lg"
+                >
+                  <div className="flex flex-col items-center space-y-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-10 w-10 text-gray-300"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 17v-2a4 4 0 018 0v2m-8 4h8a2 2 0 002-2v-6a2 2 0 00-2-2h-8a2 2 0 00-2 2v6a2 2 0 002 2z"
+                      />
+                    </svg>
+                    <p>
+                      No habits found. Start tracking something great today!
+                    </p>
+                  </div>
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
