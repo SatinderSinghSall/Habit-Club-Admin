@@ -6,6 +6,7 @@ import {
   FaUserTimes,
   FaEnvelope,
 } from "react-icons/fa";
+import { RiAdminFill } from "react-icons/ri";
 
 function Overview() {
   const [stats, setStats] = useState([]);
@@ -43,6 +44,11 @@ function Overview() {
             title: "New Messages",
             value: data.newMessages,
             icon: <FaEnvelope className="text-yellow-500 w-8 h-8" />,
+          },
+          {
+            title: "Total Admin",
+            value: data.totalAdmin,
+            icon: <RiAdminFill className="text-pink-500 w-8 h-8" />,
           },
         ]);
       } catch (error) {
