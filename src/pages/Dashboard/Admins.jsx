@@ -16,6 +16,8 @@ function Admins() {
     show: false,
     adminId: null,
   });
+  const [addLoading, setAddLoading] = useState(false);
+  const [deleteLoadingId, setDeleteLoadingId] = useState(null);
 
   useEffect(() => {
     fetchAdmins();
@@ -50,6 +52,8 @@ function Admins() {
       return;
     }
 
+    setAddLoading(true);
+
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/admin`, {
         method: "POST",
@@ -70,6 +74,8 @@ function Admins() {
       console.error(err);
       toast.error(err.message);
       setError(err.message);
+    } finally {
+      setAddLoading(false);
     }
   };
 
@@ -109,6 +115,7 @@ function Admins() {
   };
 
   const confirmDelete = async () => {
+    setDeleteLoadingId(confirmState.adminId);
     try {
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/admin/${confirmState.adminId}`,
@@ -126,6 +133,8 @@ function Admins() {
       console.error(err);
       toast.error(err.message);
       setError(err.message);
+    } finally {
+      setDeleteLoadingId(null);
     }
   };
 
@@ -202,9 +211,14 @@ function Admins() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  disabled={addLoading}
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
                 >
-                  {editingAdmin ? "Update Admin" : "Add Admin"}
+                  {addLoading
+                    ? "Submitting..."
+                    : editingAdmin
+                    ? "Update Admin"
+                    : "Add Admin"}
                 </button>
               </div>
             </form>
@@ -223,13 +237,14 @@ function Admins() {
                 onClick={cancelDelete}
                 className="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400"
               >
-                Cancel
+                No, Cancel
               </button>
               <button
                 onClick={confirmDelete}
-                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                disabled={!!deleteLoadingId}
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 disabled:opacity-50"
               >
-                Delete
+                {deleteLoadingId ? "Deleting..." : "Yes, Delete"}
               </button>
             </div>
           </div>
