@@ -11,6 +11,8 @@ function Users() {
   const [newUser, setNewUser] = useState({ name: "", email: "", password: "" });
   const [editUser, setEditUser] = useState(null);
   const [userToDelete, setUserToDelete] = useState(null);
+  const [savingUser, setSavingUser] = useState(false);
+  const [deletingUser, setDeletingUser] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -19,6 +21,8 @@ function Users() {
 
   const handleAddUser = async (e) => {
     e.preventDefault();
+    setSavingUser(true);
+
     const method = editUser ? "PUT" : "POST";
     const url = editUser
       ? `${import.meta.env.VITE_API_URL}/users/${editUser._id}`
@@ -44,14 +48,18 @@ function Users() {
       setEditUser(null);
       setShowModal(false);
 
-      toast.success(editUser ? "User updated" : "User added"); // hot-toast
+      toast.success(editUser ? "User updated" : "User added");
     } catch (err) {
       console.error("Save user error:", err.message);
-      toast.error(err.message); // hot-toast
+      toast.error(err.message);
+    } finally {
+      setSavingUser(false);
     }
   };
 
   const handleDeleteUser = async () => {
+    setDeletingUser(true);
+
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/users/${userToDelete._id}`,
@@ -68,6 +76,8 @@ function Users() {
     } catch (err) {
       console.error("Delete error:", err.message);
       notify.error(err.message);
+    } finally {
+      setDeletingUser(false);
     }
   };
 
@@ -164,9 +174,42 @@ function Users() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  disabled={savingUser}
+                  className={`px-4 py-2 rounded text-white ${
+                    savingUser
+                      ? "bg-blue-400 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700"
+                  }`}
                 >
-                  {editUser ? "Update" : "Add"}
+                  {savingUser ? (
+                    <span className="flex items-center gap-2">
+                      <svg
+                        className="animate-spin h-4 w-4 text-white"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v8H4z"
+                        ></path>
+                      </svg>
+                      Saving...
+                    </span>
+                  ) : editUser ? (
+                    "Update"
+                  ) : (
+                    "Add"
+                  )}
                 </button>
               </div>
             </form>
@@ -185,13 +228,44 @@ function Users() {
                 onClick={closeDeleteModal}
                 className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
               >
-                Cancel
+                No, Cancel
               </button>
               <button
                 onClick={handleDeleteUser}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                disabled={deletingUser}
+                className={`px-4 py-2 rounded text-white ${
+                  deletingUser
+                    ? "bg-red-400 cursor-not-allowed"
+                    : "bg-red-600 hover:bg-red-700"
+                }`}
               >
-                Delete
+                {deletingUser ? (
+                  <span className="flex items-center gap-2">
+                    <svg
+                      className="animate-spin h-4 w-4 text-white"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v8H4z"
+                      ></path>
+                    </svg>
+                    Deleting...
+                  </span>
+                ) : (
+                  "Yes, Delete"
+                )}
               </button>
             </div>
           </div>
