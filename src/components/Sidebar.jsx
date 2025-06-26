@@ -58,15 +58,15 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
   return (
     <>
       <div
-        className={`top-0 left-0 bg-gradient-to-b from-gray-900 to-gray-800 text-white shadow-lg flex flex-col transition-all duration-300
+        className={`fixed top-0 left-0 h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white shadow-lg flex flex-col transition-all duration-300 z-40
           ${
             isMobile
               ? isOpen
-                ? "fixed w-64 h-full translate-x-0 z-40"
-                : "fixed w-64 h-full -translate-x-full z-40"
+                ? "w-64 translate-x-0"
+                : "-translate-x-full"
               : isOpen
-              ? "relative w-80 h-screen"
-              : "relative w-20 h-screen"
+              ? "w-80"
+              : "w-20"
           }
         `}
       >
@@ -95,7 +95,9 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
               to={item.path}
               onClick={() => handleNavItemClick(item.path)}
               className={`flex items-center gap-4 py-3 px-4 mx-2 rounded-lg transition-all duration-200 ${
-                activeItem === item.path ? "bg-purple-600" : "hover:bg-gray-700"
+                activeItem === item.path
+                  ? "bg-purple-600"
+                  : "hover:bg-gray-700"
               }`}
             >
               <span className="text-xl">{item.icon}</span>

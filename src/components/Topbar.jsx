@@ -26,7 +26,7 @@ const Topbar = ({ onMenuClick }) => {
         <button className="md:hidden text-2xl" onClick={onMenuClick}>
           <FaBars />
         </button>
-        <h2 className="text-lg md:text-xl font-semibold text-gray-700 whitespace-nowrap">
+        <h2 className="text-lg md:text-xl font-semibold text-gray-900 whitespace-nowrap drop-shadow-sm">
           HabitClub Admin Panel
         </h2>
       </div>
